@@ -1,0 +1,30 @@
+{
+  "name": "sera-be-test",
+  "version": "1.0.0",
+  "description": "",
+  "main": "/src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js",
+    "test": "mocha --recursive test/app.test.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "amqplib": "^0.10.5",
+    "body-parser": "^1.20.3",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "mailgun-js": "^0.22.0",
+    "nodemailer": "^6.9.16",
+    "pg": "^8.13.1"
+  },
+  "devDependencies": {
+    "chai": "^4.3.7",
+    "chai-http": "^5.1.1",
+    "mocha": "^11.0.1",
+    "nodemon": "^3.1.9",
+    "supertest": "^7.0.0"
+  }
+}
