@@ -1,6 +1,5 @@
 const Transactions = require('../models/transaction');
 const { getChannel } = require('../services/rabbitmq');
-const { sendEmail } = require('../services/email.service');
 
 class TransactionsController {
     static async create(req, res) {
@@ -61,20 +60,23 @@ class TransactionsController {
     }
 
     static async notify(req, res) {
-        const { email, transactionId } = req.body;
-
-        if (!email || !transactionId) {
-            return res.status(400).json({ message: 'Email and transactionId are required' });
-        }
-
         try {
-            const subject = `Notification for Transaction ID: ${transactionId}`;
-            const text = `Your transaction with ID ${transactionId} has been processed successfully.`;
-            await sendEmail(email, subject, text);
+            const channel = getChannel();
+            const EMAIL_QUEUE = 'email_queue';
 
-            res.status(200).json({ message: 'Notification sent successfully' });
+            const emailData = {
+                to: req.body.to,
+                subject: req.body.subject,
+                text: req.body.text,
+            };
+
+            await channel.assertQueue(EMAIL_QUEUE, { durable: true });
+            channel.sendToQueue(EMAIL_QUEUE, Buffer.from(JSON.stringify(emailData)));
+
+            res.status(200).json({ message: 'Email notification queued' });
         } catch (error) {
-            res.status(500).json({ message: 'Failed to send notification', error: error.message });
+            console.error('Failed to queue email:', error.message);
+            res.status(500).json({ error: error.message });
         }
     }
 }
